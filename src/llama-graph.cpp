@@ -1704,9 +1704,10 @@ ggml_tensor * llm_graph_context::build_lora_mm_id(
           ggml_tensor * slots) const {
     cur = build_hadamard_input(w, cur);
     // the experts in the MoE cache are selected by their slots
+    // TODO: remap scales to cache slots and pass them to the cached matmul.
     ggml_tensor * res = slots == nullptr ?
         ggml_mul_mat_id_ext(ctx0, w, cur, ids, w_s, nullptr) :
-        ggml_mul_mat_id(ctx0, moe_cache->get_experts(w), cur, slots);
+        ggml_mul_mat_id_ext(ctx0, moe_cache->get_experts(w), cur, slots, nullptr, nullptr);
 
     if (prec_policy) {
         prec_policy->apply(res);
